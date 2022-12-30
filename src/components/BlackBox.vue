@@ -1,10 +1,5 @@
 <script setup lang="ts">
-interface BlockState {
-  x: number
-  y: number
-  revealed: boolean
-  isBall: boolean
-}
+import type { BlockState, directionAllType, directionType } from '~/types'
 
 const WIDTH = 8
 const HEIGHT = 8
@@ -16,8 +11,44 @@ const board = ref(Array.from({ length: HEIGHT }, (_, row) =>
     y: row,
     revealed: false,
     isBall: false,
-  })),
-))
+    lightOn: false,
+    getSibling(direction: directionAllType) {
+      switch (direction) {
+        case 'top':
+          if (this.y - 1 < 0)
+            return
+          return board.value[this.y - 1][this.x]
+        case 'bottom':
+          if (this.y + 1 >= HEIGHT)
+            return
+          return board.value[this.y + 1][this.x]
+        case 'left':
+          if (this.x - 1 < 0)
+            return
+          return board.value[this.y][this.x - 1]
+        case 'right':
+          if (this.x + 1 >= WIDTH)
+            return
+          return board.value[this.y][this.x + 1]
+        case 'leftTop':
+          if (this.x - 1 < 0 || this.y - 1 < 0)
+            return
+          return board.value[this.y - 1][this.x - 1]
+        case 'leftBottom':
+          if (this.x - 1 < 0 || this.y + 1 >= HEIGHT)
+            return
+          return board.value[this.y + 1][this.x - 1]
+        case 'rightTop':
+          if (this.x + 1 >= WIDTH || this.y - 1 < 0)
+            return
+          return board.value[this.y - 1][this.x + 1]
+        case 'rightBottom':
+          if (this.x + 1 >= WIDTH || this.y + 1 >= HEIGHT)
+            return
+          return board.value[this.y + 1][this.x + 1]
+      }
+    },
+  }))))
 
 const lighters = {
   top: new Array(WIDTH).fill('-'),
@@ -46,46 +77,134 @@ function randomIntNums(min: number, max: number, num: number) {
   return arr
 }
 
-function updateLighters() {
-  
+function handleclick(lighterLoc: directionType, idx: number) {
+  let initBlock: BlockState
+  switch (lighterLoc) {
+    case 'top':
+      initBlock = board.value[0][idx]
+      if (initBlock.isBall)
+        return
+      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
+        return
+      emitLight(initBlock, 'bottom')
+      break
+    case 'bottom':
+      initBlock = board.value[HEIGHT - 1][idx]
+      if (initBlock.isBall)
+        return
+      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
+        return
+      emitLight(initBlock, 'top')
+      break
+    case 'left':
+      initBlock = board.value[idx][0]
+      if (initBlock.isBall)
+        return
+      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
+        return
+      emitLight(initBlock, 'right')
+      break
+    case 'right':
+      initBlock = board.value[idx][WIDTH - 1]
+      if (initBlock.isBall)
+        return
+      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
+        return
+      emitLight(initBlock, 'left')
+      break
+  }
+}
+
+function emitLight(block: BlockState, direction: directionType) {
+  if (!block)
+    return
+  block.lightOn = true
+  switch (direction) {
+    case 'top':
+      if (block.getSibling('top')?.isBall)
+        return
+      if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall)
+        emitLight(block.getSibling('bottom')!, 'bottom')
+      else if (block.getSibling('leftTop')?.isBall)
+        emitLight(block.getSibling('right')!, 'right')
+      else if (block.getSibling('rightTop')?.isBall)
+        emitLight(block.getSibling('left')!, 'left')
+      else
+        emitLight(block.getSibling('top')!, 'top')
+      return
+    case 'bottom':
+      if (block.getSibling('bottom')?.isBall)
+        return
+      if (block.getSibling('leftBottom')?.isBall && block.getSibling('rightBottom')?.isBall)
+        emitLight(block.getSibling('top')!, 'top')
+      else if (block.getSibling('leftBottom')?.isBall)
+        emitLight(block.getSibling('right')!, 'right')
+      else if (block.getSibling('rightBottom')?.isBall)
+        emitLight(block.getSibling('left')!, 'left')
+      else
+        emitLight(block.getSibling('bottom')!, 'bottom')
+      return
+    case 'left':
+      if (block.getSibling('left')?.isBall)
+        return
+      if (block.getSibling('leftTop')?.isBall && block.getSibling('leftBottom')?.isBall)
+        emitLight(block.getSibling('right')!, 'right')
+      else if (block.getSibling('leftTop')?.isBall)
+        emitLight(block.getSibling('bottom')!, 'bottom')
+      else if (block.getSibling('leftBottom')?.isBall)
+        emitLight(block.getSibling('top')!, 'top')
+      else
+        emitLight(block.getSibling('left')!, 'left')
+      return
+    case 'right':
+      if (block.getSibling('right')?.isBall)
+        return
+      if (block.getSibling('rightTop')?.isBall && block.getSibling('rightBottom')?.isBall)
+        emitLight(block.getSibling('left')!, 'left')
+      else if (block.getSibling('rightTop')?.isBall)
+        emitLight(block.getSibling('bottom')!, 'bottom')
+      else if (block.getSibling('rightBottom')?.isBall)
+        emitLight(block.getSibling('top')!, 'top')
+      else
+        emitLight(block.getSibling('right')!, 'right')
+  }
 }
 
 generateBalls()
 </script>
 
-function
 <template>
   <div id="grid-container">
     <div id="top-container" flex="~">
       <button
-        v-for="item, idx in lighters.top" :key="idx"
-        block mb-2
+        v-for="lighter, idx in lighters.top" :key="idx"
+        block mb-2 @click="handleclick('top', idx)"
       >
-        {{ item }}
+        {{ lighter }}
       </button>
     </div>
     <div id="bottom-container" flex="~">
       <button
-        v-for="item, idx in lighters.bottom" :key="idx"
-        block mt-2
+        v-for="lighter, idx in lighters.bottom" :key="idx"
+        block mt-2 @click="handleclick('bottom', idx)"
       >
-        {{ item }}
+        {{ lighter }}
       </button>
     </div>
     <div id="left-container" flex="~ col" items-end>
       <button
-        v-for="item, idx in lighters.left" :key="idx"
-        block mr-2
+        v-for="lighter, idx in lighters.left" :key="idx"
+        block mr-2 @click="handleclick('left', idx)"
       >
-        {{ item }}
+        {{ lighter }}
       </button>
     </div>
     <div id="right-container" flex="~ col" items-start>
       <button
-        v-for="item, idx in lighters.right" :key="idx"
-        block ml-2
+        v-for="lighter, idx in lighters.right" :key="idx"
+        block ml-2 @click="handleclick('right', idx)"
       >
-        {{ item }}
+        {{ lighter }}
       </button>
     </div>
     <div id="box-container" flex="~ col" items-center>
@@ -96,6 +215,9 @@ function
         >
           <template v-if="block.isBall">
             🔮
+          </template>
+          <template v-else-if="block.lightOn">
+            <div class="lightpath-h" />
           </template>
         </div>
       </div>
@@ -131,5 +253,11 @@ function
 
 #box-container {
   grid-area: main;
+}
+
+.lightpath-h {
+  width: 100%;
+  height: 100%;
+  background-color: yellow;
 }
 </style>
