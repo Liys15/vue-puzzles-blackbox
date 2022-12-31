@@ -1,0 +1,51 @@
+.lightpath {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+}
+
+.top-bottom,
+.bottom-top {
+  background-image: url('public/lighting/top-bottom.svg');
+}
+
+.left-right,
+.right-left{
+  background-image: url('public/lighting/left-right.svg');
+}
+
+.top-left,
+.left-top{
+  background-image: url('public/lighting/top-left.svg');
+}
+
+.top-right,
+.right-top {
+  background-image: url('public/lighting/top-right.svg');
+}
+
+.bottom-left,
+.left-bottom {
+  background-image: url('public/lighting/bottom-left.svg');
+}
+
+.bottom-right,
+.right-bottom {
+  background-image: url('public/lighting/bottom-right.svg');
+}
+
+.top-top{
+  background-image: url('public/lighting/top-top.svg');
+}
+
+.bottom-bottom{
+  background-image: url('public/lighting/bottom-bottom.svg');
+}
+
+.left-left {
+  background-image: url('public/lighting/left-left.svg');
+}
+
+.right-right {
+  background-image: url('public/lighting/right-right.svg');
+}

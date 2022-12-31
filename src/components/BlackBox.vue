@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GamePlay } from '~/composables/logic'
+import { GamePlay } from '~/composables'
 
 const play = new GamePlay('Medium')
 </script>
@@ -9,48 +9,40 @@ const play = new GamePlay('Medium')
     <div id="top-container" flex="~">
       <button
         v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
-        block mb-2 @click="play.switchOn(lighter)"
+        block-div mb-2 @click="play.switchOn(lighter)"
       >
-        {{ lighter.type }}
+        {{ lighter.text }}
       </button>
     </div>
     <div id="bottom-container" flex="~">
       <button
         v-for="lighter, idx in play.state.value.lighters.bottom" :key="idx"
-        block mt-2 @click="play.switchOn(lighter)"
+        block-div mt-2 @click="play.switchOn(lighter)"
       >
-        {{ lighter.type }}
+        {{ lighter.text }}
       </button>
     </div>
     <div id="left-container" flex="~ col" items-end>
       <button
         v-for="lighter, idx in play.state.value.lighters.left" :key="idx"
-        block mr-2 @click="play.switchOn(lighter)"
+        block-div mr-2 @click="play.switchOn(lighter)"
       >
-        {{ lighter.type }}
+        {{ lighter.text }}
       </button>
     </div>
     <div id="right-container" flex="~ col" items-start>
       <button
         v-for="lighter, idx in play.state.value.lighters.right" :key="idx"
-        block ml-2 @click="play.switchOn(lighter)"
+        block-div ml-2 @click="play.switchOn(lighter)"
       >
-        {{ lighter.type }}
+        {{ lighter.text }}
       </button>
     </div>
     <div id="box-container" flex="~ col" items-center>
       <div v-for="(row, y) in play.state.value.board" :key="y" flex="~">
-        <div
-          v-for="(block, x) in row" :key="x"
-          block flex="~" items-center justify-center
-        >
-          <template v-if="block.isBall">
-            🔮
-          </template>
-          <template v-else-if="block.lightOn">
-            <div class="lightpath-h" />
-          </template>
-        </div>
+        <BlackBall
+          v-for="(block, x) in row" :key="x" :block="block"
+        />
       </div>
     </div>
   </div>
@@ -84,11 +76,5 @@ const play = new GamePlay('Medium')
 
 #box-container {
   grid-area: main;
-}
-
-.lightpath-h {
-  width: 100%;
-  height: 100%;
-  background-color: yellow;
 }
 </style>

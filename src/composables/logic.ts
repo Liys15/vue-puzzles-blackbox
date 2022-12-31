@@ -36,7 +36,7 @@ export class GamePlay {
   static width = 0
   static height = 0
   static ballnum = 0
-  lightPath: LightPath
+  private lightPath: LightPath
 
   constructor(defaultGame: 'Easy' | 'Medium' | 'Hard') {
     this.state.value = {
@@ -73,7 +73,7 @@ export class GamePlay {
       Array.from({ length: GamePlay.width }, (_, col): BlockState => ({
         x: col,
         y: row,
-        revealed: false,
+        revealed: true,
         isBall: false,
         lightOn: false,
         getSibling(direction: directionAllType) {
@@ -121,42 +121,38 @@ export class GamePlay {
       top: Array.from({ length: GamePlay.width }, (_, idx) => ({
         loc: 'top',
         i: idx,
-        type: undefined,
+        text: undefined,
         isOn: false,
         lightPath: [],
-        connectedLighter: undefined,
       })),
       bottom: Array.from({ length: GamePlay.width }, (_, idx) => ({
         loc: 'bottom',
         i: idx,
-        type: undefined,
+        text: undefined,
         isOn: false,
         lightPath: [],
-        connectedLighter: undefined,
       })),
       left: Array.from({ length: GamePlay.height }, (_, idx) => ({
         loc: 'left',
         i: idx,
-        type: undefined,
+        text: undefined,
         isOn: false,
         lightPath: [],
-        connectedLighter: undefined,
       })),
       right: Array.from({ length: GamePlay.height }, (_, idx) => ({
         loc: 'right',
         i: idx,
-        type: undefined,
+        text: undefined,
         isOn: false,
         lightPath: [],
-        connectedLighter: undefined,
       })),
     }
 
     this.generateBalls()
-    this.updateLighters()
+    this.updateLighterText()
   }
 
-  generateBalls() {
+  private generateBalls() {
     const rdmArr = randomIntNums(0, GamePlay.width * GamePlay.height, GamePlay.ballnum)
     rdmArr.forEach((pos) => {
       const y = Math.floor(pos / GamePlay.width)
@@ -165,17 +161,48 @@ export class GamePlay {
     })
   }
 
-  updateLighters() {
+  private updateLighterText() {
     const lightersflat = [
       ...this.state.value.lighters.top,
       ...this.state.value.lighters.bottom,
       ...this.state.value.lighters.left,
       ...this.state.value.lighters.right,
     ]
-    lightersflat.forEach(lighter => this.switchOn(lighter))
+    let initNum = 1
+    lightersflat.forEach((lighter) => {
+      this.updateLightPath(lighter)
+      const len = lighter.lightPath.length
+      if (len) {
+        const endBlock = lighter.lightPath[len - 1].block
+        const toDirection = lighter.lightPath[len - 1].to
+        const nextBlock = endBlock.getSibling(toDirection)
+        if (nextBlock) {
+          lighter.text = 'H'
+        }
+        else {
+          let connectedLighter: Lighter = {} as Lighter
+          if (toDirection === 'top')
+            connectedLighter = this.state.value.lighters.top[endBlock.x]
+          else if (toDirection === 'bottom')
+            connectedLighter = this.state.value.lighters.bottom[endBlock.x]
+          else if (toDirection === 'left')
+            connectedLighter = this.state.value.lighters.left[endBlock.y]
+          else if (toDirection === 'right')
+            connectedLighter = this.state.value.lighters.right[endBlock.y]
+          if (connectedLighter === lighter) {
+            lighter.text = 'R'
+          }
+          else {
+            lighter.text = initNum
+            connectedLighter.text = initNum
+            initNum += 1
+          }
+        }
+      }
+    })
   }
 
-  switchOn(lighter: Lighter) {
+  private updateLightPath(lighter: Lighter) {
     this.lightPath = []
     lighter.lightPath = this.lightPath
     let initBlock: BlockState
@@ -193,23 +220,33 @@ export class GamePlay {
         initBlock = this.state.value.board[lighter.i][GamePlay.width - 1]
         break
     }
-    if (initBlock.isBall)
+    if (initBlock.isBall) {
+      lighter.text = 'H'
       return
+    }
     if (lighter.loc === 'top' || lighter.loc === 'bottom') {
-      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
+      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall) {
+        lighter.text = 'R'
         return
+      }
     }
     else if (lighter.loc === 'left' || lighter.loc === 'right') {
-      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
+      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall) {
+        lighter.text = 'R'
         return
+      }
     }
     this.emitLight(initBlock, lighter.loc)
   }
 
-  emitLight(block: BlockState, fromDirection: directionType) {
+  private emitLight(block: BlockState, fromDirection: directionType) {
     if (!block)
       return
     let toDirection: directionType = reverseDirection(fromDirection)
+    if (block.getSibling(toDirection)?.isBall) {
+      this.lightPath.push({ block, from: fromDirection, to: toDirection })
+      return
+    }
     switch (toDirection) {
       case 'top':
         if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall)
@@ -243,9 +280,18 @@ export class GamePlay {
         else if (block.getSibling('rightBottom')?.isBall)
           toDirection = 'top'
     }
-    this.lightPath.push({ x: block.x, y: block.y, from: fromDirection, to: toDirection })
-    if (block.getSibling(toDirection)?.isBall)
-      return
+    this.lightPath.push({ block, from: fromDirection, to: toDirection })
     this.emitLight(block.getSibling(toDirection)!, reverseDirection(toDirection))
+  }
+
+  switchOn(lighter: Lighter) {
+    this.state.value.board.flat().forEach(block => block.lightOn = false)
+    lighter.lightPath.forEach(({ block, from, to }, idx) => {
+      setTimeout(() => {
+        block.lightFrom = from
+        block.lightTo = to
+        block.lightOn = true
+      }, 35 * idx)
+    })
   }
 }

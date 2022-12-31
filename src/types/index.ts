@@ -4,6 +4,8 @@ export interface BlockState extends getSiblings {
   revealed: boolean
   isBall: boolean
   lightOn: boolean
+  lightFrom?: directionType
+  lightTo?: directionType
 }
 
 export interface Lighters {
@@ -17,12 +19,11 @@ export interface Lighter {
   loc: directionType
   i: number
   isOn: boolean
-  type: 'H' | 'R' | number | undefined
+  text: 'H' | 'R' | number | undefined
   lightPath: LightPath
-  connectedLighter: Lighter | undefined
 }
 
-export type LightPath = { x: number; y: number; from: directionType; to: directionType }[]
+export type LightPath = { block: BlockState; from: directionType; to: directionType }[]
 
 export type directionType = 'top' | 'bottom' | 'left' | 'right'
 
@@ -33,3 +34,4 @@ export type directionAllType = directionType | directionCornerType
 interface getSiblings {
   getSibling: (direction: directionAllType) => BlockState | undefined
 }
+
