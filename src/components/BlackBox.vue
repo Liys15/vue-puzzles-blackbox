@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { BlockState, directionAllType, directionType } from '~/types'
+import type {
+  BlockState, LightPath, Lighter, Lighters,
+  directionAllType, directionType,
+} from '~/types'
 
 const WIDTH = 8
 const HEIGHT = 8
@@ -50,11 +53,39 @@ const board = ref(Array.from({ length: HEIGHT }, (_, row) =>
     },
   }))))
 
-const lighters = {
-  top: new Array(WIDTH).fill('-'),
-  bottom: new Array(WIDTH).fill('-'),
-  left: new Array(HEIGHT).fill('-'),
-  right: new Array(HEIGHT).fill('-'),
+const lighters: Lighters = {
+  top: Array.from({ length: WIDTH }, (_, idx) => ({
+    loc: 'top',
+    i: idx,
+    type: undefined,
+    isOn: false,
+    lightPath: [],
+    connectedLighter: undefined,
+  })),
+  bottom: Array.from({ length: WIDTH }, (_, idx) => ({
+    loc: 'bottom',
+    i: idx,
+    type: undefined,
+    isOn: false,
+    lightPath: [],
+    connectedLighter: undefined,
+  })),
+  left: Array.from({ length: WIDTH }, (_, idx) => ({
+    loc: 'left',
+    i: idx,
+    type: undefined,
+    isOn: false,
+    lightPath: [],
+    connectedLighter: undefined,
+  })),
+  right: Array.from({ length: WIDTH }, (_, idx) => ({
+    loc: 'right',
+    i: idx,
+    type: undefined,
+    isOn: false,
+    lightPath: [],
+    connectedLighter: undefined,
+  })),
 }
 
 function generateBalls() {
@@ -77,100 +108,114 @@ function randomIntNums(min: number, max: number, num: number) {
   return arr
 }
 
-function handleclick(lighterLoc: directionType, idx: number) {
-  let initBlock: BlockState
-  switch (lighterLoc) {
+function reverseDirection(from: directionType): directionType {
+  switch (from) {
     case 'top':
-      initBlock = board.value[0][idx]
-      if (initBlock.isBall)
-        return
-      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
-        return
-      emitLight(initBlock, 'bottom')
-      break
+      return 'bottom'
     case 'bottom':
-      initBlock = board.value[HEIGHT - 1][idx]
-      if (initBlock.isBall)
-        return
-      if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
-        return
-      emitLight(initBlock, 'top')
-      break
+      return 'top'
     case 'left':
-      initBlock = board.value[idx][0]
-      if (initBlock.isBall)
-        return
-      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
-        return
-      emitLight(initBlock, 'right')
-      break
+      return 'right'
     case 'right':
-      initBlock = board.value[idx][WIDTH - 1]
-      if (initBlock.isBall)
-        return
-      if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
-        return
-      emitLight(initBlock, 'left')
-      break
+      return 'left'
   }
 }
 
-function emitLight(block: BlockState, direction: directionType) {
+let lightPath: LightPath = []
+
+function switchOn(lighter: Lighter) {
+  lightPath = []
+  lighter.lightPath = lightPath
+  let initBlock: BlockState
+  switch (lighter.loc) {
+    case 'top':
+      initBlock = board.value[0][lighter.i]
+      break
+    case 'bottom':
+      initBlock = board.value[HEIGHT - 1][lighter.i]
+      break
+    case 'left':
+      initBlock = board.value[lighter.i][0]
+      break
+    case 'right':
+      initBlock = board.value[lighter.i][WIDTH - 1]
+      break
+  }
+  if (initBlock.isBall)
+    return
+  if (lighter.loc === 'top' || lighter.loc === 'bottom') {
+    if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall)
+      return
+  }
+  else if (lighter.loc === 'left' || lighter.loc === 'right') {
+    if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall)
+      return
+  }
+  emitLight(initBlock, lighter.loc)
+}
+
+function emitLight(block: BlockState, fromDirection: directionType) {
   if (!block)
     return
   block.lightOn = true
-  switch (direction) {
+  let toDirection: directionType = reverseDirection(fromDirection)
+  switch (toDirection) {
     case 'top':
       if (block.getSibling('top')?.isBall)
         return
       if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall)
-        emitLight(block.getSibling('bottom')!, 'bottom')
+        toDirection = 'bottom'
       else if (block.getSibling('leftTop')?.isBall)
-        emitLight(block.getSibling('right')!, 'right')
+        toDirection = 'right'
       else if (block.getSibling('rightTop')?.isBall)
-        emitLight(block.getSibling('left')!, 'left')
-      else
-        emitLight(block.getSibling('top')!, 'top')
-      return
+        toDirection = 'left'
+      break
     case 'bottom':
       if (block.getSibling('bottom')?.isBall)
         return
       if (block.getSibling('leftBottom')?.isBall && block.getSibling('rightBottom')?.isBall)
-        emitLight(block.getSibling('top')!, 'top')
+        toDirection = 'top'
       else if (block.getSibling('leftBottom')?.isBall)
-        emitLight(block.getSibling('right')!, 'right')
+        toDirection = 'right'
       else if (block.getSibling('rightBottom')?.isBall)
-        emitLight(block.getSibling('left')!, 'left')
-      else
-        emitLight(block.getSibling('bottom')!, 'bottom')
-      return
+        toDirection = 'left'
+      break
     case 'left':
       if (block.getSibling('left')?.isBall)
         return
       if (block.getSibling('leftTop')?.isBall && block.getSibling('leftBottom')?.isBall)
-        emitLight(block.getSibling('right')!, 'right')
+        toDirection = 'right'
       else if (block.getSibling('leftTop')?.isBall)
-        emitLight(block.getSibling('bottom')!, 'bottom')
+        toDirection = 'bottom'
       else if (block.getSibling('leftBottom')?.isBall)
-        emitLight(block.getSibling('top')!, 'top')
-      else
-        emitLight(block.getSibling('left')!, 'left')
-      return
+        toDirection = 'top'
+      break
     case 'right':
       if (block.getSibling('right')?.isBall)
         return
       if (block.getSibling('rightTop')?.isBall && block.getSibling('rightBottom')?.isBall)
-        emitLight(block.getSibling('left')!, 'left')
+        toDirection = 'left'
       else if (block.getSibling('rightTop')?.isBall)
-        emitLight(block.getSibling('bottom')!, 'bottom')
+        toDirection = 'bottom'
       else if (block.getSibling('rightBottom')?.isBall)
-        emitLight(block.getSibling('top')!, 'top')
-      else
-        emitLight(block.getSibling('right')!, 'right')
+        toDirection = 'top'
   }
+  lightPath.push({
+    x: block.x,
+    y: block.y,
+    from: fromDirection,
+    to: toDirection,
+  })
+  emitLight(block.getSibling(toDirection)!, reverseDirection(toDirection))
+}
+
+function updateLighters() {
+  const lightersflat = [...lighters.top, ...lighters.bottom, ...lighters.left, ...lighters.right]
+  lightersflat.forEach(lighter => switchOn(lighter))
 }
 
 generateBalls()
+updateLighters()
 </script>
 
 <template>
@@ -178,33 +223,33 @@ generateBalls()
     <div id="top-container" flex="~">
       <button
         v-for="lighter, idx in lighters.top" :key="idx"
-        block mb-2 @click="handleclick('top', idx)"
+        block mb-2 @click="switchOn(lighter)"
       >
-        {{ lighter }}
+        {{ lighter.type }}
       </button>
     </div>
     <div id="bottom-container" flex="~">
       <button
         v-for="lighter, idx in lighters.bottom" :key="idx"
-        block mt-2 @click="handleclick('bottom', idx)"
+        block mt-2 @click="switchOn(lighter)"
       >
-        {{ lighter }}
+        {{ lighter.type }}
       </button>
     </div>
     <div id="left-container" flex="~ col" items-end>
       <button
         v-for="lighter, idx in lighters.left" :key="idx"
-        block mr-2 @click="handleclick('left', idx)"
+        block mr-2 @click="switchOn(lighter)"
       >
-        {{ lighter }}
+        {{ lighter.type }}
       </button>
     </div>
     <div id="right-container" flex="~ col" items-start>
       <button
         v-for="lighter, idx in lighters.right" :key="idx"
-        block ml-2 @click="handleclick('right', idx)"
+        block ml-2 @click="switchOn(lighter)"
       >
-        {{ lighter }}
+        {{ lighter.type }}
       </button>
     </div>
     <div id="box-container" flex="~ col" items-center>
