@@ -161,8 +161,6 @@ function emitLight(block: BlockState, fromDirection: directionType) {
   let toDirection: directionType = reverseDirection(fromDirection)
   switch (toDirection) {
     case 'top':
-      if (block.getSibling('top')?.isBall)
-        return
       if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall)
         toDirection = 'bottom'
       else if (block.getSibling('leftTop')?.isBall)
@@ -171,8 +169,6 @@ function emitLight(block: BlockState, fromDirection: directionType) {
         toDirection = 'left'
       break
     case 'bottom':
-      if (block.getSibling('bottom')?.isBall)
-        return
       if (block.getSibling('leftBottom')?.isBall && block.getSibling('rightBottom')?.isBall)
         toDirection = 'top'
       else if (block.getSibling('leftBottom')?.isBall)
@@ -181,8 +177,6 @@ function emitLight(block: BlockState, fromDirection: directionType) {
         toDirection = 'left'
       break
     case 'left':
-      if (block.getSibling('left')?.isBall)
-        return
       if (block.getSibling('leftTop')?.isBall && block.getSibling('leftBottom')?.isBall)
         toDirection = 'right'
       else if (block.getSibling('leftTop')?.isBall)
@@ -191,8 +185,6 @@ function emitLight(block: BlockState, fromDirection: directionType) {
         toDirection = 'top'
       break
     case 'right':
-      if (block.getSibling('right')?.isBall)
-        return
       if (block.getSibling('rightTop')?.isBall && block.getSibling('rightBottom')?.isBall)
         toDirection = 'left'
       else if (block.getSibling('rightTop')?.isBall)
@@ -200,12 +192,9 @@ function emitLight(block: BlockState, fromDirection: directionType) {
       else if (block.getSibling('rightBottom')?.isBall)
         toDirection = 'top'
   }
-  lightPath.push({
-    x: block.x,
-    y: block.y,
-    from: fromDirection,
-    to: toDirection,
-  })
+  lightPath.push({ x: block.x, y: block.y, from: fromDirection, to: toDirection })
+  if (block.getSibling(toDirection)?.isBall)
+    return
   emitLight(block.getSibling(toDirection)!, reverseDirection(toDirection))
 }
 
