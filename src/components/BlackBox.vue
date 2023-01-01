@@ -57,6 +57,8 @@ const play = new GamePlay('Medium')
       </div>
     </div>
   </div>
+
+  <Confetti :passed="play.state.value.gameState === 'won'" />
 </template>
 
 <style>
