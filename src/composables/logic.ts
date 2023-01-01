@@ -172,15 +172,6 @@ export class GamePlay {
     })
   }
 
-  private flatLighters<T>(lightersLike: {'top':T[], 'bottom':T[], 'left':T[], 'right':T[]}):T[] {
-    return [
-      ...lightersLike.top,
-      ...lightersLike.bottom,
-      ...lightersLike.left,
-      ...lightersLike.right,
-    ]
-  }
-
   checkSolution() {
     this.state.value.board.flat().forEach(block => block.revealed = true)
     direction.forEach(key => {
@@ -192,7 +183,6 @@ export class GamePlay {
     const solutionLighterTextArr = this.getLightersTextArr(true)
     const solutionFlat = this.flatLighters(solutionLighterTextArr)
     const questionFlat = this.flatLighters(this.state.value.lighters).map(lighter => lighter.text)
-
     if(solutionFlat.every((solution, idx) => solution === questionFlat[idx])) {
       this.state.value.gameState = 'won'
     }
@@ -200,6 +190,41 @@ export class GamePlay {
       this.state.value.gameState = 'lost'
     }
     return
+  }
+
+  getCoLighters(lighter: Lighter) {
+    if(typeof lighter.text === 'number') {
+      const idxNum = lighter.text
+      const lightersflat = this.flatLighters(this.state.value.lighters)
+      return lightersflat.find(e => e.text===idxNum)?.coLighter
+    }
+    else
+    return undefined
+  }
+
+  handeleRightClick(block: BlockState) {
+    if(this.state.value.gameState === 'play')
+      block.flagged = !block.flagged
+  }
+
+  switchOn(lighter: Lighter) {
+    this.state.value.board.flat().forEach(block => block.lightOn = false)
+    lighter.lightPath.forEach(({ block, from, to }, idx) => {
+      setTimeout(() => {
+        block.lightFrom = from
+        block.lightTo = to
+        block.lightOn = true
+      }, 35 * idx)
+    })
+  }
+
+  private flatLighters<T>(lightersLike: {'top':T[], 'bottom':T[], 'left':T[], 'right':T[]}):T[] {
+    return [
+      ...lightersLike.top,
+      ...lightersLike.bottom,
+      ...lightersLike.left,
+      ...lightersLike.right,
+    ]
   }
 
   private generateBalls() {
@@ -360,33 +385,5 @@ export class GamePlay {
     }
     emitLight(initBlock, lighter.loc)
     return tmplightpath
-
-  }
-
-  getCoLighters(lighter: Lighter) {
-    if(typeof lighter.text === 'number') {
-      const idxNum = lighter.text
-      const lightersflat = this.flatLighters(this.state.value.lighters)
-      return lightersflat.find(e => e.text===idxNum)?.coLighter
-    }
-    else
-    return undefined
-  }
-
-
-  handeleRightClick(block: BlockState) {
-    if(this.state.value.gameState === 'play')
-      block.flagged = !block.flagged
-  }
-
-  switchOn(lighter: Lighter) {
-    this.state.value.board.flat().forEach(block => block.lightOn = false)
-    lighter.lightPath.forEach(({ block, from, to }, idx) => {
-      setTimeout(() => {
-        block.lightFrom = from
-        block.lightTo = to
-        block.lightOn = true
-      }, 35 * idx)
-    })
   }
 }
