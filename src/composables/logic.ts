@@ -5,7 +5,10 @@ interface GameState {
   gameState: 'play' | 'won' | 'lost'
   board: BlockState[][]
   lighters: Lighters
+  solutionBoard: BlockState[][]
 }
+
+const direction = ['top', 'bottom', 'left', 'right']
 
 function randomIntNums(min: number, max: number, num: number) {
   const arr: number[] = []
@@ -33,7 +36,6 @@ function reverseDirection(from: directionType): directionType {
 
 export class GamePlay {
   state = ref<GameState>({} as GameState)
-  solution = ref<number[]>([])
   static width = 0
   static height = 0
   static ballnum = 0
@@ -44,6 +46,7 @@ export class GamePlay {
       gameState: 'play',
       board: [] as BlockState[][],
       lighters: {} as Lighters,
+      solutionBoard: [] as BlockState[][]
     }
     this.reset(defaultGame)
   }
@@ -115,6 +118,7 @@ export class GamePlay {
       ),
     )
     this.state.value.board = board
+    this.state.value.solutionBoard = []
 
     this.state.value.lighters = {
       top: Array.from({ length: GamePlay.width }, (_, idx) => ({
@@ -149,17 +153,36 @@ export class GamePlay {
 
     this.generateBalls()
 
-    const keys = Object.keys(this.state.value.lighters) as (keyof Lighters)[]
+    direction.forEach(key => {
+      this.state.value.lighters[key as keyof Lighters].forEach(lighter => {
+        const lightpath = this.getLightPath(lighter)
+        lighter.lightPath = lightpath
+      })
+    })
 
-    const lighterTextArr = this.getLightersPath()
-    keys.forEach(key => {
+    const lighterTextArr = this.getLightersTextArr()
+    direction.forEach(key => {
       this.state.value.lighters[key as keyof Lighters]
         .forEach(lighter => lighter.text=lighterTextArr[key as keyof Lighters][lighter.i])
     })
   }
 
   checkSolution() {
+    const solutionLighterTextArr = this.getLightersTextArr(this.state.value.solutionBoard)
+    const solutionFlat = [
+      ...solutionLighterTextArr['top'],
+      ...solutionLighterTextArr['bottom'],
+      ...solutionLighterTextArr['left'],
+      ...solutionLighterTextArr['right'],
+    ]
+    const questionFlat = [
+      ...this.state.value.lighters['top'],
+      ...this.state.value.lighters['bottom'],
+      ...this.state.value.lighters['left'],
+      ...this.state.value.lighters['right'],
+    ].map(lighter => lighter.text)
 
+    return solutionFlat.every((solution, idx) => solution === questionFlat[idx])
   }
 
   private generateBalls() {
@@ -171,24 +194,27 @@ export class GamePlay {
     })
   }
 
-  private getLightersPath() {
+  private getLightersTextArr(soultion?: BlockState[][]) {
+    if(!this.state.value.solutionBoard) {
+      console.log('@');
+    }
     const lighterTextArr = {
       top: new Array<Lighter["text"]>(GamePlay.width),
       bottom: new Array<Lighter["text"]>(GamePlay.width),
       left: new Array<Lighter["text"]>(GamePlay.height),
       right: new Array<Lighter["text"]>(GamePlay.height),
     }
-    const keys = Object.keys(lighterTextArr) as (keyof Lighters)[]
     let initNum = 1
-    keys.forEach(key =>
-      this.state.value.lighters[key].forEach((lighter) => {
-        const lightPath = this.getLightPath(lighter)
-        if(!Array.isArray(lightPath))
-          lighterTextArr[lighter.loc][lighter.i] = lightPath
-        else{
-          lighter.lightPath = lightPath
-          const endBlock = lightPath[lightPath.length - 1].block
-          const toDirection = lightPath[lightPath.length - 1].to
+    direction.forEach(key =>
+      this.state.value.lighters[key as (keyof Lighters)].forEach((lighter) => {
+        const lightpath = lighter.lightPath
+        if(!lightpath.length)
+          lighterTextArr[lighter.loc][lighter.i] = 'H'
+        else if(lightpath.length === 1)
+          lighterTextArr[lighter.loc][lighter.i] = 'R'
+        else {
+          const endBlock = lightpath[lightpath.length - 1].block
+          const toDirection = lightpath[lightpath.length - 1].to
           const nextBlock = endBlock.getSibling(toDirection)
           if (nextBlock) {
             lighterTextArr[lighter.loc][lighter.i] = 'H'
@@ -222,80 +248,100 @@ export class GamePlay {
     const emitLight = (block: BlockState, fromDirection: directionType) => {
       if (!block)
         return
+      let pushblock = block
       let toDirection: directionType = reverseDirection(fromDirection)
       if (block.getSibling(toDirection)?.isBall) {
-        lightPath.push({ block, from: fromDirection, to: toDirection })
+        tmplightpath.push({ block, from: fromDirection, to: toDirection })
         return
       }
       switch (toDirection) {
         case 'top':
-          if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall)
+          if (block.getSibling('leftTop')?.isBall && block.getSibling('rightTop')?.isBall){
+            tmplightpath.push({block, from:fromDirection, to: toDirection})
+            pushblock = block.getSibling('top')!
             toDirection = 'bottom'
+          }
           else if (block.getSibling('leftTop')?.isBall)
             toDirection = 'right'
           else if (block.getSibling('rightTop')?.isBall)
             toDirection = 'left'
           break
         case 'bottom':
-          if (block.getSibling('leftBottom')?.isBall && block.getSibling('rightBottom')?.isBall)
+          if (block.getSibling('leftBottom')?.isBall && block.getSibling('rightBottom')?.isBall){
+            tmplightpath.push({block, from:fromDirection, to: toDirection})
+            pushblock = block.getSibling('bottom')!
             toDirection = 'top'
+          }
           else if (block.getSibling('leftBottom')?.isBall)
             toDirection = 'right'
           else if (block.getSibling('rightBottom')?.isBall)
             toDirection = 'left'
           break
         case 'left':
-          if (block.getSibling('leftTop')?.isBall && block.getSibling('leftBottom')?.isBall)
+          if (block.getSibling('leftTop')?.isBall && block.getSibling('leftBottom')?.isBall){
+            tmplightpath.push({block, from:fromDirection, to: toDirection})
+            pushblock = block.getSibling('left')!
             toDirection = 'right'
+          }
           else if (block.getSibling('leftTop')?.isBall)
             toDirection = 'bottom'
           else if (block.getSibling('leftBottom')?.isBall)
             toDirection = 'top'
           break
         case 'right':
-          if (block.getSibling('rightTop')?.isBall && block.getSibling('rightBottom')?.isBall)
+          if (block.getSibling('rightTop')?.isBall && block.getSibling('rightBottom')?.isBall){
+            tmplightpath.push({block, from:fromDirection, to: toDirection})
+            pushblock = block.getSibling('right')!
             toDirection = 'left'
+          }
           else if (block.getSibling('rightTop')?.isBall)
             toDirection = 'bottom'
           else if (block.getSibling('rightBottom')?.isBall)
             toDirection = 'top'
+          break
       }
-      lightPath.push({ block, from: fromDirection, to: toDirection })
-      emitLight(block.getSibling(toDirection)!, reverseDirection(toDirection))
+      tmplightpath.push({ block:pushblock, from: fromDirection, to: toDirection })
+      emitLight(pushblock.getSibling(toDirection)!, reverseDirection(toDirection))
     }
 
-    let lightPath = [] as LightPath
+    let tmplightpath = [] as LightPath
     let initBlock: BlockState
     switch (lighter.loc) {
       case 'top':
         initBlock = this.state.value.board[0][lighter.i]
+        tmplightpath.push({block:initBlock, from: 'top', to: 'bottom'})
         break
       case 'bottom':
         initBlock = this.state.value.board[GamePlay.width - 1][lighter.i]
+        tmplightpath.push({block:initBlock, from: 'bottom', to: 'top'})
         break
       case 'left':
         initBlock = this.state.value.board[lighter.i][0]
+        tmplightpath.push({block:initBlock, from: 'left', to: 'right'})
         break
       case 'right':
         initBlock = this.state.value.board[lighter.i][GamePlay.width - 1]
+        tmplightpath.push({block:initBlock, from: 'right', to: 'left'})
         break
     }
     if (initBlock.isBall) {
-      return 'H'
+      return []
     }
     if (lighter.loc === 'top' || lighter.loc === 'bottom') {
       if (initBlock.getSibling('left')?.isBall || initBlock.getSibling('right')?.isBall) {
-        return 'R'
+        tmplightpath[0].to = tmplightpath[0].from
+        return tmplightpath
       }
     }
     else if (lighter.loc === 'left' || lighter.loc === 'right') {
       if (initBlock.getSibling('top')?.isBall || initBlock.getSibling('bottom')?.isBall) {
-        return 'R'
+        tmplightpath[0].to = tmplightpath[0].from
+        return tmplightpath
       }
     }
     emitLight(initBlock, lighter.loc)
 
-    return lightPath
+    return tmplightpath
 
   }
 
