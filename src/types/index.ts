@@ -2,6 +2,7 @@ export interface BlockState extends getSiblings {
   x: number
   y: number
   revealed: boolean
+  flagged: boolean
   isBall: boolean
   lightOn: boolean
   lightFrom?: directionType

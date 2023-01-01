@@ -75,7 +75,8 @@ export class GamePlay {
       Array.from({ length: GamePlay.width }, (_, col): BlockState => ({
         x: col,
         y: row,
-        revealed: true,
+        revealed: false,
+        flagged: false,
         isBall: false,
         lightOn: false,
         getSibling(direction: directionAllType) {
@@ -168,7 +169,14 @@ export class GamePlay {
   }
 
   checkSolution() {
-    const solutionLighterTextArr = this.getLightersTextArr(this.state.value.solutionBoard)
+    this.state.value.board.flat().forEach(block => block.revealed = true)
+    direction.forEach(key => {
+      this.state.value.lighters[key as keyof Lighters].forEach(lighter => {
+        const lightpath = this.getLightPath(lighter)
+        lighter.lightPath = lightpath
+      })
+    })
+    const solutionLighterTextArr = this.getLightersTextArr(true)
     const solutionFlat = [
       ...solutionLighterTextArr['top'],
       ...solutionLighterTextArr['bottom'],
@@ -182,7 +190,13 @@ export class GamePlay {
       ...this.state.value.lighters['right'],
     ].map(lighter => lighter.text)
 
-    return solutionFlat.every((solution, idx) => solution === questionFlat[idx])
+    if(solutionFlat.every((solution, idx) => solution === questionFlat[idx])) {
+      this.state.value.gameState = 'won'
+    }
+    else {
+      this.state.value.gameState = 'lost'
+    }
+    return
   }
 
   private generateBalls() {
@@ -194,8 +208,8 @@ export class GamePlay {
     })
   }
 
-  private getLightersTextArr(soultion?: BlockState[][]) {
-    if(!this.state.value.solutionBoard) {
+  private getLightersTextArr(soultionCheck: boolean = false) {
+    if(soultionCheck) {
       console.log('@');
     }
     const lighterTextArr = {
@@ -340,12 +354,14 @@ export class GamePlay {
       }
     }
     emitLight(initBlock, lighter.loc)
-
     return tmplightpath
 
   }
 
-
+  handeleRightClick(block: BlockState) {
+    if(this.state.value.gameState === 'play')
+      block.flagged = !block.flagged
+  }
 
   switchOn(lighter: Lighter) {
     this.state.value.board.flat().forEach(block => block.lightOn = false)

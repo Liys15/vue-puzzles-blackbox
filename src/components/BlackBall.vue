@@ -14,5 +14,10 @@ defineProps<{
       </template>
       <div v-else-if="block.lightOn" :class="`lightpath ${block.lightFrom}-${block.lightTo}`" />
     </template>
+    <template v-else>
+      <template v-if="block.flagged">
+        🚩
+      </template>
+    </template>
   </div>
 </template>
