@@ -1,3 +1,10 @@
+.locked-block {
+  width: 100%;
+  height: 100%;
+  background-image: url('/lock-pattern.svg');
+}
+
+
 .lightpath {
   width: 100%;
   height: 100%;
@@ -6,46 +13,46 @@
 
 .top-bottom,
 .bottom-top {
-  background-image: url('public/lighting/top-bottom.svg');
+  background-image: url('/lighting/top-bottom.svg');
 }
 
 .left-right,
 .right-left{
-  background-image: url('public/lighting/left-right.svg');
+  background-image: url('/lighting/left-right.svg');
 }
 
 .top-left,
 .left-top{
-  background-image: url('public/lighting/top-left.svg');
+  background-image: url('/lighting/top-left.svg');
 }
 
 .top-right,
 .right-top {
-  background-image: url('public/lighting/top-right.svg');
+  background-image: url('/lighting/top-right.svg');
 }
 
 .bottom-left,
 .left-bottom {
-  background-image: url('public/lighting/bottom-left.svg');
+  background-image: url('/lighting/bottom-left.svg');
 }
 
 .bottom-right,
 .right-bottom {
-  background-image: url('public/lighting/bottom-right.svg');
+  background-image: url('/lighting/bottom-right.svg');
 }
 
 .top-top{
-  background-image: url('public/lighting/top-top.svg');
+  background-image: url('/lighting/top-top.svg');
 }
 
 .bottom-bottom{
-  background-image: url('public/lighting/bottom-bottom.svg');
+  background-image: url('/lighting/bottom-bottom.svg');
 }
 
 .left-left {
-  background-image: url('public/lighting/left-left.svg');
+  background-image: url('/lighting/left-left.svg');
 }
 
 .right-right {
-  background-image: url('public/lighting/right-right.svg');
+  background-image: url('/lighting/right-right.svg');
 }

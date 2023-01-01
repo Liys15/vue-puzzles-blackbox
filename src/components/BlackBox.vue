@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { GamePlay } from '~/composables'
 import '~/styles/animation.css'
+import { directionType } from '~/types';
 
 const play = new GamePlay('Medium')
 </script>
@@ -24,33 +25,14 @@ const play = new GamePlay('Medium')
       Check
     </button>
   </div>
-  <div
-    id="grid-container" m-6
-  >
-    <div id="top-container" flex="~" justify-evenly m-1>
+  <div id="grid-container" m-6>
+    <div v-for="loc, idx in GamePlay.direction" :key="idx" :id="`${loc}-container`" class="flex-container">
       <LighterBtn
-        v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
-        :lighter="lighter"
+        v-for="lighter, idx in play.state.value.lighters[loc as directionType]" :key="idx"
+        :lighter="lighter" @click="play.handleLighterClick(lighter)"
       />
     </div>
-    <div id="bottom-container" flex="~" justify-evenly m-1>
-      <LighterBtn
-        v-for="lighter, idx in play.state.value.lighters.bottom" :key="idx"
-        :lighter="lighter"
-      />
-    </div>
-    <div id="left-container" flex="~ col" justify-evenly m-1>
-      <LighterBtn
-        v-for="lighter, idx in play.state.value.lighters.left" :key="idx"
-        :lighter="lighter"
-      />
-    </div>
-    <div id="right-container" flex="~ col" justify-evenly m-1>
-      <LighterBtn
-        v-for="lighter, idx in play.state.value.lighters.right" :key="idx"
-        :lighter="lighter"
-      />
-    </div>
+
     <div
       id="box-container" flex="~ col" items-center justify-evenly m-1
       :class="play.state.value.gameState === 'lost' ? 'hvr-buzz-out' : ''"
@@ -58,6 +40,7 @@ const play = new GamePlay('Medium')
       <div v-for="(row, y) in play.state.value.board" :key="y" w-full flex="~" justify-evenly>
         <BlackBall
           v-for="(block, x) in row" :key="x" :block="block"
+          @click="block.locked = !block.locked"
           @contextmenu.prevent="play.handeleRightClick(block)"
         />
       </div>
@@ -77,6 +60,12 @@ const play = new GamePlay('Medium')
     ". bottom .";
 }
 
+.flex-container{
+  display: flex;
+  justify-content: space-evenly;
+  margin: 2px;
+}
+
 #top-container {
   grid-area: top;
 }
@@ -86,10 +75,12 @@ const play = new GamePlay('Medium')
 }
 
 #left-container {
+  flex-direction: column;
   grid-area: left;
 }
 
 #right-container {
+  flex-direction: column;
   grid-area: right;
 }
 
