@@ -130,9 +130,12 @@ export class GamePlay {
     if (this.state.value.gameState === 'play') {
       const idx = lighter.i
       let tmpArr = [] as BlockState[]
+      let tmpBlock = {} as BlockState
       if (lighter.loc === 'top' || lighter.loc === 'bottom')
         for (let y = 0; y < GamePlay.height; y++) {
-          tmpArr.push(this.state.value.board[y][idx])
+          tmpBlock = this.state.value.board[y][idx]
+          // if (tmpBlock.locked) continue
+          tmpArr.push(tmpBlock)
         }
       else
         tmpArr = this.state.value.board[idx]
@@ -147,7 +150,7 @@ export class GamePlay {
   }
 
   handeleRightClick(block: BlockState) {
-    if (this.state.value.gameState === 'play')
+    if (!block.locked && this.state.value.gameState === 'play')
       block.flagged = !block.flagged
   }
 

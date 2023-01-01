@@ -13,6 +13,8 @@ function getBlockState() {
   if (b.revealed) {
     if (b.isBall)
       varclass = b.flagged ? 'bg-green-500/60 flip' : 'bg-rose-400 flip'
+    else if (b.flagged)
+      varclass = b.isBall ? 'bg-green-500/60 flip' : 'bg-rose-400 flip'
     else
       varclass = 'bg-gray-300 dark:bg-gray-600'
     if (b.lightOn)
@@ -20,7 +22,8 @@ function getBlockState() {
     return `${baseclass} ${varclass}`
   }
   else {
-    return 'block-div'
+    if (b.locked) return 'block-div locked-block'
+    else return 'block-div'
   }
 }
 </script>
@@ -30,19 +33,12 @@ function getBlockState() {
     flex="~" items-center justify-center
     :class="getBlockState()"
   >
-    <template v-if="block.revealed">
-      <template v-if="block.isBall">
-        🔮
-      </template>
-      <div v-else-if="block.lightOn"  />
+    <template v-if="block.revealed && block.isBall">
+      🔮
     </template>
-    <template v-else>
-      <template v-if="block.locked">
-        <div class="locked-block" />
-      </template>
-      <template v-else-if="block.flagged">
-        🚩
-      </template>
+    <div v-else-if="block.lightOn"  />
+    <template v-else-if="block.flagged">
+      🚩
     </template>
   </div>
 </template>
