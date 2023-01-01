@@ -62,9 +62,9 @@ export class GamePlay {
         GamePlay.ballnum = 5
         break
       case 'Hard':
-        GamePlay.width = 10
+        GamePlay.width = 14
         GamePlay.height = 10
-        GamePlay.ballnum = 5
+        GamePlay.ballnum = Math.round(5 + Math.random() * 10)
         break
     }
     this.state.value.gameState = 'play'
@@ -306,7 +306,7 @@ export class GamePlay {
         tmplightpath.push({ block: initBlock, from: 'top', to: 'bottom' })
         break
       case 'bottom':
-        initBlock = gameMap[GamePlay.width - 1][lighter.i]
+        initBlock = gameMap[GamePlay.height - 1][lighter.i]
         tmplightpath.push({ block: initBlock, from: 'bottom', to: 'top' })
         break
       case 'left':
