@@ -19,9 +19,10 @@ export interface Lighters {
 export interface Lighter {
   loc: directionType
   i: number
-  isOn: boolean
+  isHover: boolean
   text: 'H' | 'R' | number | undefined
   lightPath: LightPath
+  coLighter: Lighter | undefined
 }
 
 export type LightPath = { block: BlockState; from: directionType; to: directionType }[]

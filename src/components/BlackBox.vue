@@ -24,32 +24,32 @@ const play = new GamePlay('Medium')
     </button>
   </div>
   <div id="grid-container" m-6>
-    <div id="top-container" flex="~" m-2>
+    <div id="top-container" flex="~" justify-evenly m-1>
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
         :lighter="lighter"
       />
     </div>
-    <div id="bottom-container" flex="~" m-2>
+    <div id="bottom-container" flex="~" justify-evenly m-1>
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.bottom" :key="idx"
         :lighter="lighter"
       />
     </div>
-    <div id="left-container" flex="~ col" items-end>
+    <div id="left-container" flex="~ col" justify-evenly m-1>
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.left" :key="idx"
         :lighter="lighter"
       />
     </div>
-    <div id="right-container" flex="~ col" items-start>
+    <div id="right-container" flex="~ col" justify-evenly m-1>
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.right" :key="idx"
         :lighter="lighter"
       />
     </div>
-    <div id="box-container" flex="~ col" items-center>
-      <div v-for="(row, y) in play.state.value.board" :key="y" flex="~">
+    <div id="box-container" flex="~ col" items-center justify-evenly m-1>
+      <div v-for="(row, y) in play.state.value.board" :key="y" w-full flex="~" justify-evenly>
         <BlackBall
           v-for="(block, x) in row" :key="x" :block="block"
           @contextmenu.prevent="play.handeleRightClick(block)"

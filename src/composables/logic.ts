@@ -126,29 +126,33 @@ export class GamePlay {
         loc: 'top',
         i: idx,
         text: undefined,
-        isOn: false,
+        isHover: false,
         lightPath: [],
+        coLighter: undefined
       })),
       bottom: Array.from({ length: GamePlay.width }, (_, idx) => ({
         loc: 'bottom',
         i: idx,
         text: undefined,
-        isOn: false,
+        isHover: false,
         lightPath: [],
+        coLighter: undefined
       })),
       left: Array.from({ length: GamePlay.height }, (_, idx) => ({
         loc: 'left',
         i: idx,
         text: undefined,
-        isOn: false,
+        isHover: false,
         lightPath: [],
+        coLighter: undefined
       })),
       right: Array.from({ length: GamePlay.height }, (_, idx) => ({
         loc: 'right',
         i: idx,
         text: undefined,
-        isOn: false,
+        isHover: false,
         lightPath: [],
+        coLighter: undefined
       })),
     }
 
@@ -168,6 +172,15 @@ export class GamePlay {
     })
   }
 
+  private flatLighters<T>(lightersLike: {'top':T[], 'bottom':T[], 'left':T[], 'right':T[]}):T[] {
+    return [
+      ...lightersLike.top,
+      ...lightersLike.bottom,
+      ...lightersLike.left,
+      ...lightersLike.right,
+    ]
+  }
+
   checkSolution() {
     this.state.value.board.flat().forEach(block => block.revealed = true)
     direction.forEach(key => {
@@ -177,18 +190,8 @@ export class GamePlay {
       })
     })
     const solutionLighterTextArr = this.getLightersTextArr(true)
-    const solutionFlat = [
-      ...solutionLighterTextArr['top'],
-      ...solutionLighterTextArr['bottom'],
-      ...solutionLighterTextArr['left'],
-      ...solutionLighterTextArr['right'],
-    ]
-    const questionFlat = [
-      ...this.state.value.lighters['top'],
-      ...this.state.value.lighters['bottom'],
-      ...this.state.value.lighters['left'],
-      ...this.state.value.lighters['right'],
-    ].map(lighter => lighter.text)
+    const solutionFlat = this.flatLighters(solutionLighterTextArr)
+    const questionFlat = this.flatLighters(this.state.value.lighters).map(lighter => lighter.text)
 
     if(solutionFlat.every((solution, idx) => solution === questionFlat[idx])) {
       this.state.value.gameState = 'won'
@@ -234,21 +237,23 @@ export class GamePlay {
             lighterTextArr[lighter.loc][lighter.i] = 'H'
           }
           else {
-            let connectedLighter: Lighter = {} as Lighter
+            let coLighter: Lighter = {} as Lighter
             if (toDirection === 'top')
-              connectedLighter = this.state.value.lighters.top[endBlock.x]
+              coLighter = this.state.value.lighters.top[endBlock.x]
             else if (toDirection === 'bottom')
-              connectedLighter = this.state.value.lighters.bottom[endBlock.x]
+              coLighter = this.state.value.lighters.bottom[endBlock.x]
             else if (toDirection === 'left')
-              connectedLighter = this.state.value.lighters.left[endBlock.y]
+              coLighter = this.state.value.lighters.left[endBlock.y]
             else if (toDirection === 'right')
-              connectedLighter = this.state.value.lighters.right[endBlock.y]
-            if (connectedLighter === lighter) {
+              coLighter = this.state.value.lighters.right[endBlock.y]
+            if (coLighter === lighter) {
               lighterTextArr[lighter.loc][lighter.i] = 'R'
             }
             else {
+              lighter.coLighter = coLighter
+              coLighter.coLighter = lighter
               lighterTextArr[lighter.loc][lighter.i] = initNum
-              lighterTextArr[connectedLighter.loc][connectedLighter.i] = initNum
+              lighterTextArr[coLighter.loc][coLighter.i] = initNum
               initNum += 1
             }
           }
@@ -357,6 +362,17 @@ export class GamePlay {
     return tmplightpath
 
   }
+
+  getCoLighters(lighter: Lighter) {
+    if(typeof lighter.text === 'number') {
+      const idxNum = lighter.text
+      const lightersflat = this.flatLighters(this.state.value.lighters)
+      return lightersflat.find(e => e.text===idxNum)?.coLighter
+    }
+    else
+    return undefined
+  }
+
 
   handeleRightClick(block: BlockState) {
     if(this.state.value.gameState === 'play')
