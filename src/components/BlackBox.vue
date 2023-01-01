@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { GamePlay } from '~/composables'
+import '~/styles/animation.css'
 
 const play = new GamePlay('Medium')
 </script>
@@ -23,7 +24,9 @@ const play = new GamePlay('Medium')
       Check
     </button>
   </div>
-  <div id="grid-container" m-6>
+  <div
+    id="grid-container" m-6
+  >
     <div id="top-container" flex="~" justify-evenly m-1>
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
@@ -48,7 +51,10 @@ const play = new GamePlay('Medium')
         :lighter="lighter"
       />
     </div>
-    <div id="box-container" flex="~ col" items-center justify-evenly m-1>
+    <div
+      id="box-container" flex="~ col" items-center justify-evenly m-1
+      :class="play.state.value.gameState === 'lost' ? 'hvr-buzz-out' : ''"
+    >
       <div v-for="(row, y) in play.state.value.board" :key="y" w-full flex="~" justify-evenly>
         <BlackBall
           v-for="(block, x) in row" :key="x" :block="block"

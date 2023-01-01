@@ -93,7 +93,7 @@ export class GamePlay {
     this.state.value.board.forEach((row, y) => {
       row.forEach((block, x) => {
         block.revealed = true
-        if(block.isBall)
+        if(block.flagged)
           solutionBoard[y][x].isBall = true
       })
     })
