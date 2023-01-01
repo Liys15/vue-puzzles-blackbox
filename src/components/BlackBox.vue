@@ -24,37 +24,29 @@ const play = new GamePlay('Medium')
     </button>
   </div>
   <div id="grid-container" m-6>
-    <div id="top-container" flex="~">
-      <button
+    <div id="top-container" flex="~" m-2>
+      <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
-        block-div mb-2 @click="play.switchOn(lighter)"
-      >
-        {{ lighter.text }}
-      </button>
+        :lighter="lighter"
+      />
     </div>
-    <div id="bottom-container" flex="~">
-      <button
+    <div id="bottom-container" flex="~" m-2>
+      <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.bottom" :key="idx"
-        block-div mt-2 @click="play.switchOn(lighter)"
-      >
-        {{ lighter.text }}
-      </button>
+        :lighter="lighter"
+      />
     </div>
     <div id="left-container" flex="~ col" items-end>
-      <button
+      <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.left" :key="idx"
-        block-div mr-2 @click="play.switchOn(lighter)"
-      >
-        {{ lighter.text }}
-      </button>
+        :lighter="lighter"
+      />
     </div>
     <div id="right-container" flex="~ col" items-start>
-      <button
+      <LighterBtn
         v-for="lighter, idx in play.state.value.lighters.right" :key="idx"
-        block-div ml-2 @click="play.switchOn(lighter)"
-      >
-        {{ lighter.text }}
-      </button>
+        :lighter="lighter"
+      />
     </div>
     <div id="box-container" flex="~ col" items-center>
       <div v-for="(row, y) in play.state.value.board" :key="y" flex="~">

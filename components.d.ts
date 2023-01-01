@@ -9,7 +9,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     BlackBall: typeof import('./src/components/BlackBall.vue')['default']
     BlackBox: typeof import('./src/components/BlackBox.vue')['default']
-    TheCounter: typeof import('./src/components/TheCounter.vue')['default']
+    LighterBtn: typeof import('./src/components/LighterBtn.vue')['default']
     TheFooter: typeof import('./src/components/TheFooter.vue')['default']
   }
 }
