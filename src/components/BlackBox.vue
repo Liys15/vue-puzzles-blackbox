@@ -5,7 +5,25 @@ const play = new GamePlay('Medium')
 </script>
 
 <template>
-  <div id="grid-container">
+  <div class="menu" flex="~" justify-center gap-2 pt-2>
+    <button btn @click="play.reset('Easy')">
+      Easy
+    </button>
+    <button btn @click="play.reset('Medium')">
+      Medium
+    </button>
+    <button btn @click="play.reset('Hard')">
+      Hard
+    </button>
+    <button
+      w-4em pl-2 pr-2 rd-1 text-black dark:text-white
+      bg="purple-500/80" hover:bg-fuchsia-500
+      @click="play.checkSolution()"
+    >
+      Check
+    </button>
+  </div>
+  <div id="grid-container" m-6>
     <div id="top-container" flex="~">
       <button
         v-for="lighter, idx in play.state.value.lighters.top" :key="idx"
