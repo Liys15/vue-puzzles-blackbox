@@ -174,7 +174,13 @@ export class GamePlay {
     ]
   }
 
-  private generateBalls() {
+  private generateBalls(ballArr?: [number, number][]) {
+    if (ballArr) {
+      ballArr.forEach(([x, y]) =>
+        this.state.value.board[y][x].isBall = true
+      )
+      return
+    }
     const rdmArr = randomIntNums(0, GamePlay.width * GamePlay.height, GamePlay.ballnum)
     rdmArr.forEach((pos) => {
       const y = Math.floor(pos / GamePlay.width)

@@ -12,9 +12,9 @@ function getBlockState() {
   let varclass = ''
   if (b.revealed) {
     if (b.isBall)
-      varclass = b.flagged ? 'bg-green-500/60 flip' : 'bg-rose-400 flip'
+      varclass = b.flagged ? 'bg-green-500/60 flip' : props.state === 'won' ? 'bg-amber-500/60 flip' : 'bg-rose-400 flip'
     else if (b.flagged)
-      varclass = b.isBall ? 'bg-green-500/60 flip' : 'bg-rose-400 flip'
+      varclass = b.isBall ? 'bg-green-500/60 flip' : props.state === 'won' ? 'bg-amber-500/60 flip' : 'bg-rose-400 flip'
     else
       varclass = 'bg-gray-300 dark:bg-gray-600'
     if (b.lightOn)
