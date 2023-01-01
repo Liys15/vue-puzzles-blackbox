@@ -38,7 +38,7 @@ const play = new GamePlay('Medium')
       :class="play.state.value.gameState === 'lost' ? 'hvr-buzz-out' : ''"
     >
       <div v-for="(row, y) in play.state.value.board" :key="y" w-full flex="~" justify-evenly>
-        <BlackBall
+        <BlackBlock
           v-for="(block, x) in row" :key="x"
           :block="block" :state="play.state.value.gameState"
           @click="block.locked = !block.locked"
