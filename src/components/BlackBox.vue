@@ -39,7 +39,8 @@ const play = new GamePlay('Medium')
     >
       <div v-for="(row, y) in play.state.value.board" :key="y" w-full flex="~" justify-evenly>
         <BlackBall
-          v-for="(block, x) in row" :key="x" :block="block"
+          v-for="(block, x) in row" :key="x"
+          :block="block" :state="play.state.value.gameState"
           @click="block.locked = !block.locked"
           @contextmenu.prevent="play.handeleRightClick(block)"
         />
@@ -60,7 +61,7 @@ const play = new GamePlay('Medium')
     ". bottom .";
 }
 
-.flex-container{
+.flex-container {
   display: flex;
   justify-content: space-evenly;
   margin: 2px;

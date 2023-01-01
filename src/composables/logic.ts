@@ -126,7 +126,6 @@ export class GamePlay {
       return undefined
   }
 
-
   handleLighterClick(lighter: Lighter) {
     if (this.state.value.gameState === 'play') {
       const idx = lighter.i
@@ -141,6 +140,9 @@ export class GamePlay {
         tmpArr.forEach(e => e.locked = false)
       else
         tmpArr.forEach(e => e.locked = true)
+    }
+    else {
+      this.switchOn(lighter)
     }
   }
 

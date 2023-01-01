@@ -6,8 +6,6 @@
 
 
 .lightpath {
-  width: 100%;
-  height: 100%;
   background-size: contain;
 }
 
@@ -17,12 +15,12 @@
 }
 
 .left-right,
-.right-left{
+.right-left {
   background-image: url('/lighting/left-right.svg');
 }
 
 .top-left,
-.left-top{
+.left-top {
   background-image: url('/lighting/top-left.svg');
 }
 
@@ -41,11 +39,11 @@
   background-image: url('/lighting/bottom-right.svg');
 }
 
-.top-top{
+.top-top {
   background-image: url('/lighting/top-top.svg');
 }
 
-.bottom-bottom{
+.bottom-bottom {
   background-image: url('/lighting/bottom-bottom.svg');
 }
 
