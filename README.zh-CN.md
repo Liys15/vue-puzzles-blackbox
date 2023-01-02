@@ -1,5 +1,5 @@
 <p align='center'>
-  <img src='https://github.com/Liys15/vue-puzzles-blackbox/blob/master/public/favicon.svg' alt='Puzzles-black ball box' width='600'/>
+  <img src='https://github.com/Liys15/vue-puzzles-blackbox/blob/master/public/favicon.svg' alt='Puzzles-black ball box' width='120'/>
 </p>
 
 <p align='center'>
