@@ -26,7 +26,6 @@ specifiers:
   vue-tsc: ^1.0.13
 
 dependencies:
-  '@types/canvas-confetti': registry.npmmirror.com/@types/canvas-confetti/1.6.0
   '@vueuse/core': 9.6.0_vue@3.2.45
   canvas-confetti: registry.npmmirror.com/canvas-confetti/1.6.0
   vue: 3.2.45
@@ -34,6 +33,7 @@ dependencies:
 devDependencies:
   '@antfu/eslint-config': 0.33.1_ha6vam6werchizxrnqvarmz2zu
   '@iconify-json/carbon': 1.1.11
+  '@types/canvas-confetti': registry.npmmirror.com/@types/canvas-confetti/1.6.0
   '@types/node': 18.11.13
   '@unocss/reset': 0.47.6
   '@vitejs/plugin-vue': 4.0.0_vite@4.0.0+vue@3.2.45
@@ -5158,7 +5158,7 @@ packages:
     resolution: {integrity: sha512-Yq6rIccwcco0TLD5SMUrIM7Fk7Fe/C0jmNRxJJCLtAF6gebDkPuUjK5EHedxecm69Pi/aA+It39Ux4OHmFhjRw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/canvas-confetti/-/canvas-confetti-1.6.0.tgz}
     name: '@types/canvas-confetti'
     version: 1.6.0
-    dev: false
+    dev: true
 
   registry.npmmirror.com/canvas-confetti/1.6.0:
     resolution: {integrity: sha512-ej+w/m8Jzpv9Z7W7uJZer14Ke8P2ogsjg4ZMGIuq4iqUOqY2Jq8BNW42iGmNfRwREaaEfFIczLuZZiEVSYNHAA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/canvas-confetti/-/canvas-confetti-1.6.0.tgz}
