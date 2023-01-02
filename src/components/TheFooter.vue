@@ -7,7 +7,7 @@
     <a
       icon-btn i-carbon-logo-github
       rel="noreferrer"
-      href="https://github.com/Liys15/vitesse-litee"
+      href="https://github.com/Liys15/vue-puzzles-blackbox"
       target="_blank"
       title="GitHub"
     />

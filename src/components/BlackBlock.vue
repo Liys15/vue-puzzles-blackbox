@@ -8,7 +8,7 @@ const props = defineProps<{
 
 function getBlockState() {
   const b = props.block
-  const baseclass = 'w-10 h-10 b-1 b-gray-700 dark:b-black'
+  const baseclass = 'w-10 h-10 b-1 b-gray-800 dark:b-black'
   let varclass = ''
   if (b.revealed) {
     if (b.isBall)
@@ -33,20 +33,10 @@ function getBlockState() {
     flex="~" items-center justify-center
     :class="getBlockState()"
   >
-    <template v-if="block.revealed && block.isBall">
-      🔮
-    </template>
+    <div v-if="block.revealed && block.isBall" class="svg-div black-ball" />
     <div v-else-if="block.lightOn"  />
-    <template v-else-if="block.flagged">
+    <div v-else-if="block.flagged">
       🚩
-    </template>
+    </div>
   </div>
 </template>
-
-<style>
-.flip {
-  transition: transform 1s;
-  transform-style: preserve-3d;
-  transform: rotateX(360deg);
-}
-</style>

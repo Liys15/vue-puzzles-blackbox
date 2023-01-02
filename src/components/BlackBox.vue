@@ -25,8 +25,11 @@ const play = new GamePlay('Medium')
       Check
     </button>
   </div>
-  <div id="grid-container" m-6>
-    <div v-for="loc, idx in GamePlay.direction" :key="idx" :id="`${loc}-container`" class="flex-container">
+  <div id="grid-container" m-6 @contextmenu.prevent>
+    <div
+      v-for="loc, idx in GamePlay.direction" :key="idx"
+      :id="`${loc}-container`" class="flex-container"
+    >
       <LighterBtn
         v-for="lighter, idx in play.state.value.lighters[loc as directionType]" :key="idx"
         :lighter="lighter" @click="play.handleLighterClick(lighter)"

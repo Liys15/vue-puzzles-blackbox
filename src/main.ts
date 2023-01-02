@@ -5,7 +5,7 @@ import '@unocss/reset/tailwind.css'
 import './styles/main.css'
 
 import 'uno.css'
-import '~/styles/lighting.css'
+import '~/styles/style.css'
 
 const app = createApp(App)
 app.mount('#app')
